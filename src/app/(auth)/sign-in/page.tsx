@@ -1,74 +1,58 @@
+"use client";
+
+import { FormEvent } from "react";
+import Link from "next/link";
 import {
-  Card,
-  Form,
-  TextField,
-  Label,
-  Input,
-  Button,
-  Checkbox,
+  Card, Form, TextField, Label, Input, Button, FieldError,
 } from "@heroui/react";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 
 const SignIn = () => {
+  const router=useRouter()
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+    const data = Object.fromEntries(formData.entries()) as Record<string, string>;
+
+    const { error } = await authClient.signIn.email({
+      email: data.email,
+      password: data.password,
+    });
+
+    if (error) {
+      console.log(error.message);
+    }
+    router.push('/')
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
-      <Card className="w-full max-w-sm p-6 sm:p-8">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
+      <Card className="w-full max-w-md p-6 sm:p-8">
         <Card.Header className="flex flex-col gap-1 pb-6 text-center">
           <Card.Title className="text-2xl font-bold tracking-tight">
-            Sign In
+            Welcome back
           </Card.Title>
           <Card.Description className="text-sm text-muted">
-            Enter your email and password to access your account
+            Enter your credentials to sign in
           </Card.Description>
         </Card.Header>
 
         <Card.Content>
-          {/* Static HTML form submission without dynamic React state */}
-          <Form
-            action="/api/auth/login"
-            method="post"
-            className="flex flex-col gap-4"
-          >
-            {/* Email Field */}
+          <Form className="flex flex-col gap-4" onSubmit={handleSubmit}>
             <TextField isRequired name="email" type="email">
               <Label>Email</Label>
-              <Input
-                name="email"
-                type="email"
-                placeholder="@email.com"
-                autoComplete="email"
-              />
+              <Input type="email" placeholder="@email.com" autoComplete="email" />
+              <FieldError />
             </TextField>
 
-            {/* Password Field */}
             <TextField isRequired name="password" type="password">
-              <div className="flex items-center justify-between">
-                <Label>Password</Label>
-                <a
-                  href="/forgot-password"
-                  className="text-xs text-accent underline hover:opacity-80"
-                >
-                  Forgot password?
-                </a>
-              </div>
-              <Input
-                name="password"
-                type="password"
-                placeholder="••••••••"
-                autoComplete="current-password"
-              />
+              <Label>Password</Label>
+              <Input type="password" placeholder="••••••••" autoComplete="current-password" />
+              <FieldError />
             </TextField>
 
-            {/* Remember Me */}
-            <Checkbox name="remember" defaultSelected={false}>
-              <Checkbox.Content>
-                <Checkbox.Control>
-                  <Checkbox.Indicator />
-                </Checkbox.Control>
-                <span className="text-sm">Remember me</span>
-              </Checkbox.Content>
-            </Checkbox>
-
-            {/* Submit Button */}
             <Button type="submit" variant="primary" className="mt-2 w-full">
               Sign In
             </Button>
@@ -77,12 +61,9 @@ const SignIn = () => {
 
         <Card.Footer className="pt-6 text-center text-sm text-muted">
           Don&apos;t have an account?{" "}
-          <a
-            href="/signup"
-            className="font-medium text-accent underline hover:opacity-80"
-          >
+          <Link href="/sign-up" className="font-medium text-accent underline">
             Sign up
-          </a>
+          </Link>
         </Card.Footer>
       </Card>
     </div>

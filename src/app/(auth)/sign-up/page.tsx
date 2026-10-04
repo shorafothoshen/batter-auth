@@ -1,7 +1,31 @@
-import { Card,Form,TextField,Label,Input,Button,Checkbox,FieldError,Description } from "@heroui/react";
+"use client";
 
+import { FormEvent } from "react";
+import Link from "next/link";
+import {
+  Card, Form, TextField, Label, Input, Button,
+  FieldError, Description,
+} from "@heroui/react";
+import { authClient } from "@/lib/auth-client";
 
 const SignUp = () => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+    const data = Object.fromEntries(formData.entries()) as Record<string, string>;
+
+    const { error } = await authClient.signUp.email({
+      name: data.name,
+      email: data.email,
+      password: data.password,
+    });
+
+    if (error) {
+      console.log(error.message);
+    }
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
       <Card className="w-full max-w-md p-6 sm:p-8">
@@ -15,77 +39,26 @@ const SignUp = () => {
         </Card.Header>
 
         <Card.Content>
-          <Form className="flex flex-col gap-4">
-            {/* Full Name Field */}
-            <TextField
-              isRequired
-              value=''
-              
-            >
+          <Form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+            <TextField isRequired name="name">
               <Label>Full Name</Label>
               <Input placeholder="Name..." autoComplete="name" />
               <FieldError />
             </TextField>
 
-            {/* Email Field */}
-            <TextField
-              isRequired
-              type="email"
-              value=''
-              
-            >
+            <TextField isRequired name="email" type="email">
               <Label>Email</Label>
-              <Input
-                type="email"
-                placeholder="@email.com"
-                autoComplete="email"
-              />
+              <Input type="email" placeholder="@email.com" autoComplete="email" />
               <FieldError />
             </TextField>
 
-            {/* Password Field */}
-            <TextField
-              isRequired
-              type="password"
-              value=''
-             
-            >
+            <TextField isRequired name="password" type="password" minLength={8}>
               <Label>Password</Label>
-              <Input
-                type="password"
-                placeholder="••••••••"
-                autoComplete="new-password"
-              />
+              <Input type="password" placeholder="••••••••" autoComplete="new-password" />
               <Description>Must be at least 8 characters long</Description>
               <FieldError />
             </TextField>
 
-            {/* Terms and Conditions */}
-            <Checkbox
-              isRequired
-              
-             
-              className="mt-1"
-            >
-              <Checkbox.Content>
-                <Checkbox.Control>
-                  <Checkbox.Indicator />
-                </Checkbox.Control>
-                <span className="text-sm">
-                  I agree to the{" "}
-                  <a href="#terms" className="text-accent underline">
-                    Terms of Service
-                  </a>{" "}
-                  and{" "}
-                  <a href="#privacy" className="text-accent underline">
-                    Privacy Policy
-                  </a>
-                </span>
-              </Checkbox.Content>
-              <FieldError />
-            </Checkbox>
-
-            {/* Submit Button */}
             <Button type="submit" variant="primary" className="mt-2 w-full">
               Create Account
             </Button>
@@ -94,9 +67,9 @@ const SignUp = () => {
 
         <Card.Footer className="pt-6 text-center text-sm text-muted">
           Already have an account?{" "}
-          <a href="/login" className="font-medium text-accent underline">
+          <Link href="/sign-in" className="font-medium text-accent underline">
             Sign in
-          </a>
+          </Link>
         </Card.Footer>
       </Card>
     </div>

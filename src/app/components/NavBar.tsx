@@ -1,0 +1,99 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { Link, Button } from "@heroui/react";
+import { authClient } from "@/lib/auth-client";
+
+const links = [
+  { label: "Home", href: "/" },
+  { label: "Features", href: "#features" },
+  { label: "Pricing", href: "#pricing" },
+  { label: "About", href: "#about" },
+];
+
+const Logo = () => (
+  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent text-accent-foreground shadow-sm">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-5 w-5"
+    >
+      <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" />
+    </svg>
+  </div>
+);
+
+const Navbar = () => {
+  const router = useRouter();
+  const { data: session, isPending } = authClient.useSession();
+
+  const handleSignOut = async () => {
+    await authClient.signOut();
+    router.push("/sign-in");
+  };
+
+  return (
+    <nav className="sticky top-0 z-40 w-full border-b border-separator bg-background/70 backdrop-blur-lg">
+      <header className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+        {/* Left: logo */}
+        <div
+          className="flex cursor-pointer items-center gap-3"
+          onClick={() => router.push("/")}
+        >
+          <Logo />
+          <p className="text-lg font-bold tracking-tight">ACME</p>
+        </div>
+
+        {/* Center: links (mobile-e hide hoy) */}
+        <ul className="hidden items-center gap-8 md:flex">
+          {links.map((item) => (
+            <li key={item.label}>
+              <Link
+                href={item.href}
+                className="text-sm font-medium text-muted transition-colors hover:text-foreground"
+              >
+                {item.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+
+        {/* Right: auth actions */}
+        <ul className="flex items-center gap-2">
+          {isPending ? null : session ? (
+            <>
+              <li className="hidden text-sm font-medium sm:block">
+                {session.user.name}
+              </li>
+              <li>
+                <Button variant="ghost" onPress={handleSignOut}>
+                  Sign Out
+                </Button>
+              </li>
+            </>
+          ) : (
+            <>
+              <li>
+                <Button variant="ghost" onPress={() => router.push("/sign-in")}>
+                  Sign In
+                </Button>
+              </li>
+              <li>
+                <Button variant="primary" onPress={() => router.push("/sign-up")}>
+                  Get Started
+                </Button>
+              </li>
+            </>
+          )}
+        </ul>
+      </header>
+    </nav>
+  );
+};
+
+export default Navbar;
