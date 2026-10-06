@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Link, Button } from "@heroui/react";
+import { Link, Button, Avatar, Dropdown, Label } from "@heroui/react";
 import { authClient } from "@/lib/auth-client";
 
 const links = [
@@ -35,7 +35,20 @@ const Navbar = () => {
   const handleSignOut = async () => {
     await authClient.signOut();
     router.push("/sign-in");
+    router.refresh();
   };
+
+  const handleMenuAction = (key: React.Key) => {
+    if (key === "profile") router.push("/profile");
+    if (key === "signout") handleSignOut();
+  };
+
+  const initials = session?.user.name
+    ?.split(" ")
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
   return (
     <nav className="sticky top-0 z-40 w-full border-b border-separator bg-background/70 backdrop-blur-lg">
@@ -66,16 +79,37 @@ const Navbar = () => {
         {/* Right: auth actions */}
         <ul className="flex items-center gap-2">
           {isPending ? null : session ? (
-            <>
-              <li className="hidden text-sm font-medium sm:block">
-                {session.user.name}
-              </li>
-              <li>
-                <Button variant="ghost" onPress={handleSignOut}>
-                  Sign Out
-                </Button>
-              </li>
-            </>
+            <li>
+              <Dropdown>
+                <Dropdown.Trigger className="rounded-full outline-none">
+                  <Avatar>
+                    <Avatar.Image
+                      alt={session.user.name}
+                      src={session.user.image ?? undefined}
+                    />
+                    <Avatar.Fallback>{initials}</Avatar.Fallback>
+                  </Avatar>
+                </Dropdown.Trigger>
+                <Dropdown.Popover>
+                  <div className="px-3 pb-2 pt-3">
+                    <p className="text-sm font-semibold">{session.user.name}</p>
+                    <p className="text-xs text-muted">{session.user.email}</p>
+                  </div>
+                  <Dropdown.Menu onAction={handleMenuAction}>
+                    <Dropdown.Item id="profile" textValue="Profile">
+                      <Label>Profile</Label>
+                    </Dropdown.Item>
+                    <Dropdown.Item
+                      id="signout"
+                      textValue="Sign Out"
+                      variant="danger"
+                    >
+                      <Label>Sign Out</Label>
+                    </Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown.Popover>
+              </Dropdown>
+            </li>
           ) : (
             <>
               <li>
