@@ -29,6 +29,12 @@ const GoogleIcon = () => (
   </svg>
 );
 
+const GithubIcon = () => (
+  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" aria-hidden="true">
+    <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56v-2.17c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.47.11-3.06 0 0 .97-.31 3.18 1.18a11.04 11.04 0 0 1 5.79 0c2.21-1.49 3.18-1.18 3.18-1.18.63 1.59.23 2.77.11 3.06.74.81 1.19 1.84 1.19 3.1 0 4.42-2.69 5.39-5.25 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z" />
+  </svg>
+);
+
 const SignUp = () => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -50,6 +56,13 @@ const SignUp = () => {
   const google_sign_up = async () => {
     const data = await authClient.signIn.social({
       provider: "google",
+    });
+    console.log(data);
+  };
+
+  const github_sign_up = async () => {
+    const data = await authClient.signIn.social({
+      provider: "github",
     });
     console.log(data);
   };
@@ -100,15 +113,27 @@ const SignUp = () => {
             <div className="h-px flex-1 bg-separator" />
           </div>
 
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full gap-2"
-            onPress={google_sign_up}
-          >
-            <GoogleIcon />
-            Continue with Google
-          </Button>
+          <div className="flex flex-col gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full gap-2"
+              onPress={google_sign_up}
+            >
+              <GoogleIcon />
+              Continue with Google
+            </Button>
+
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full gap-2"
+              onPress={github_sign_up}
+            >
+              <GithubIcon />
+              Continue with GitHub
+            </Button>
+          </div>
         </Card.Content>
 
         <Card.Footer className="pt-6 text-center text-sm text-muted">
